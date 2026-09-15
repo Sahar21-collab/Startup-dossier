@@ -3,7 +3,7 @@ import { emptyDossier, summarize } from "@/lib/gemini";
 import { searchWeb } from "@/lib/tavily";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 const MAX_LENGTH = 100;
 
