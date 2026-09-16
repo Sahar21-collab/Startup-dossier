@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { INDUSTRIES } from "@/lib/industries";
 
 const NA = "Not enough public data found";
 
@@ -117,6 +118,96 @@ function Dossier({ result, cached, savedAt }) {
   );
 }
 
+function IndustryPanel({ open, onToggle, checked, onCheck, lists }) {
+  return (
+    <aside className={open ? "panel panel-open" : "panel"}>
+      <button type="button" className="panel-toggle" onClick={onToggle} aria-expanded={open}>
+        <span className={open ? "panel-arrow panel-arrow-open" : "panel-arrow"} aria-hidden="true">▶</span>
+        Industries
+      </button>
+
+      {open && (
+        <div className="panel-body">
+          <p className="panel-hint">Tick an industry to see 5 startups founded in the last 5 years.</p>
+          <ul className="panel-list">
+            {INDUSTRIES.map((industry) => (
+              <li key={industry.id}>
+                <label className="panel-option">
+                  <input
+                    type="checkbox"
+                    checked={!!checked[industry.id]}
+                    onChange={(e) => onCheck(industry.id, e.target.checked)}
+                  />
+                  <span>{industry.label}</span>
+                  {lists[industry.id]?.loading && <span className="panel-spinner">…</span>}
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </aside>
+  );
+}
+
+function IndustryResults({ industryId, state, onOpenDossier }) {
+  const label = state.data?.label || INDUSTRIES.find((i) => i.id === industryId)?.label || industryId;
+
+  if (state.loading) {
+    return (
+      <article className="card">
+        <h2 className="industry-title">{label}</h2>
+        <p className="hint">Looking for startups in {label}. The first time can take up to a minute.</p>
+      </article>
+    );
+  }
+  if (state.error) {
+    return (
+      <article className="card">
+        <h2 className="industry-title">{label}</h2>
+        <p className="error">{state.error}</p>
+      </article>
+    );
+  }
+
+  const startups = state.data?.startups || [];
+
+  return (
+    <article className="card">
+      <h2 className="industry-title">{label}</h2>
+      <p className="subtitle">Startups founded in the last 5 years, with public evidence that they are doing well.</p>
+
+      {startups.length ? (
+        <ol className="industry-list">
+          {startups.map((s) => (
+            <li className="industry-item" key={s.name}>
+              <h3 className="industry-name">{s.name}</h3>
+              <p className="meta">
+                {[s.foundingYear, s.location].filter((v) => v && v !== NA).join(" · ")}
+                {s.founder !== NA ? ` · Founded by ${s.founder}` : ""}
+              </p>
+              <p className="industry-text">{s.whatTheyDo}</p>
+              <p className="industry-text"><strong>Traction:</strong> <Value text={s.evidenceOfSuccess} /></p>
+              <p className="industry-links">
+                <button type="button" className="link-button" onClick={() => onOpenDossier(s.name, s.founder)}>
+                  {s.founder !== NA ? "Open full dossier" : "Search this startup"}
+                </button>
+                {s.sources?.map((src) => (
+                  <a key={src.url} href={src.url} target="_blank" rel="noopener noreferrer" className="industry-source">
+                    {hostname(src.url)}
+                  </a>
+                ))}
+              </p>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p><span className="na">No startups found with clear public evidence. Try another industry.</span></p>
+      )}
+    </article>
+  );
+}
+
 export default function Home() {
   const [startupName, setStartupName] = useState("");
   const [founderName, setFounderName] = useState("");
@@ -124,8 +215,12 @@ export default function Home() {
   const [error, setError] = useState("");
   const [data, setData] = useState(null);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  const founderInput = useRef(null);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [checked, setChecked] = useState({});
+  const [lists, setLists] = useState({});
+
+  async function runSearch(startup, founder) {
     setLoading(true);
     setError("");
     setData(null);
@@ -133,7 +228,7 @@ export default function Home() {
       const res = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ startupName, founderName }),
+        body: JSON.stringify({ startupName: startup, founderName: founder }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Something went wrong.");
@@ -145,34 +240,85 @@ export default function Home() {
     }
   }
 
+  function handleSubmit(e) {
+    e.preventDefault();
+    runSearch(startupName, founderName);
+  }
+
+  function openDossier(startup, founder) {
+    setStartupName(startup);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Founder unknown: fill in the startup and let the visitor type the founder.
+    if (!founder || founder === NA) {
+      setFounderName("");
+      founderInput.current?.focus();
+      return;
+    }
+    setFounderName(founder);
+    runSearch(startup, founder);
+  }
+
+  async function handleCheck(id, isChecked) {
+    setChecked((prev) => ({ ...prev, [id]: isChecked }));
+    if (!isChecked || lists[id]?.data) return;
+
+    setLists((prev) => ({ ...prev, [id]: { loading: true } }));
+    try {
+      const res = await fetch(`/api/industry?id=${encodeURIComponent(id)}`);
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Something went wrong.");
+      setLists((prev) => ({ ...prev, [id]: { loading: false, data: json } }));
+    } catch (err) {
+      setLists((prev) => ({ ...prev, [id]: { loading: false, error: err.message } }));
+    }
+  }
+
+  const checkedIds = INDUSTRIES.filter((i) => checked[i.id]).map((i) => i.id);
+
   return (
-    <main className="page">
-      <h1 className="title">Startup Dossier</h1>
-      <p className="subtitle">Enter a startup and its founder. We search the web and write a sourced summary.</p>
+    <div className="layout">
+      <IndustryPanel
+        open={panelOpen}
+        onToggle={() => setPanelOpen((v) => !v)}
+        checked={checked}
+        onCheck={handleCheck}
+        lists={lists}
+      />
 
-      <form className="search" onSubmit={handleSubmit}>
-        <input
-          aria-label="Startup name"
-          placeholder="Startup name"
-          value={startupName}
-          onChange={(e) => setStartupName(e.target.value)}
-          maxLength={100}
-          required
-        />
-        <input
-          aria-label="Founder name"
-          placeholder="Founder name"
-          value={founderName}
-          onChange={(e) => setFounderName(e.target.value)}
-          maxLength={100}
-          required
-        />
-        <button type="submit" disabled={loading}>{loading ? "Searching…" : "Search"}</button>
-      </form>
+      <main className="page page-with-panel">
+        <h1 className="title">Startup Stories</h1>
+        <p className="subtitle">Enter a startup and its founder. We search the web and write a sourced summary.</p>
 
-      {loading && <p className="hint">Searching the web and reading the results. This can take up to 30 seconds.</p>}
-      {error && <p className="error">{error}</p>}
-      {data && <Dossier result={data.result} cached={data.cached} savedAt={data.savedAt} />}
-    </main>
+        <form className="search" onSubmit={handleSubmit}>
+          <input
+            aria-label="Startup name"
+            placeholder="Startup name"
+            value={startupName}
+            onChange={(e) => setStartupName(e.target.value)}
+            maxLength={100}
+            required
+          />
+          <input
+            ref={founderInput}
+            aria-label="Founder name"
+            placeholder="Founder name"
+            value={founderName}
+            onChange={(e) => setFounderName(e.target.value)}
+            maxLength={100}
+            required
+          />
+          <button type="submit" disabled={loading}>{loading ? "Searching…" : "Search"}</button>
+        </form>
+
+        {loading && <p className="hint">Searching the web and reading the results. This can take up to 30 seconds.</p>}
+        {error && <p className="error">{error}</p>}
+        {data && <Dossier result={data.result} cached={data.cached} savedAt={data.savedAt} />}
+
+        {checkedIds.map((id) => (
+          <IndustryResults key={id} industryId={id} state={lists[id] || {}} onOpenDossier={openDossier} />
+        ))}
+      </main>
+    </div>
   );
 }
