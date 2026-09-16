@@ -42,7 +42,7 @@ export default function News() {
   return (
     <main className="page">
       <h1 className="title">Tech News</h1>
-      <p className="subtitle">Recent startup and technology news, summarized in plain language.</p>
+      <p className="subtitle">The 10 latest AI stories across research, healthcare, robotics, chips and business. Updated daily.</p>
 
       {!data && !error && <p className="hint">Loading the news. The first load of the day can take up to a minute.</p>}
       {error && <p className="error">{error}</p>}
@@ -53,6 +53,7 @@ export default function News() {
             <ol className="news">
               {data.items.map((item) => (
                 <li className="news-item" key={item.url}>
+                  {item.field && <span className="news-field">{item.field}</span>}
                   <h2 className="news-headline">
                     <a href={item.url} target="_blank" rel="noopener noreferrer">{item.headline}</a>
                   </h2>

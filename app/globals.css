@@ -209,6 +209,19 @@ h3 {
 .news-item:first-child { padding-top: 0; }
 .news-item:last-child { border-bottom: 0; padding-bottom: 0; }
 
+.news-field {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef1ee;
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 .news-headline {
   font-family: var(--serif);
   font-size: 1.15rem;
