@@ -1,14 +1,18 @@
 import "./globals.css";
+import Nav from "./nav";
 
 export const metadata = {
   title: "Startup Dossier",
-  description: "Type a startup and its founder to get a clear, sourced summary.",
+  description: "Search a startup and its founder, and follow recent tech news.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Nav />
+        {children}
+      </body>
     </html>
   );
 }
