@@ -439,3 +439,10 @@ h3 {
 @media (max-width: 600px) {
   .pick-item { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
+
+/* Founder background sits above "Problem solved", with a line between them */
+.section-divided {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}

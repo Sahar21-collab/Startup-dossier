@@ -48,7 +48,12 @@ function Dossier({ result, cached, savedAt }) {
         <StatusLabel status={result.status} />
       </header>
 
-      <section className="section">
+      <section className="section section-lead">
+        <h3>Founder background</h3>
+        <p><Value text={result.founderBackground} /></p>
+      </section>
+
+      <section className="section section-divided">
         <h3>Problem solved</h3>
         <p><Value text={result.problemSolved} /></p>
       </section>
@@ -333,7 +338,7 @@ export default function Home() {
           <button type="submit" disabled={loading}>{loading ? "Searching…" : "Search"}</button>
         </form>
 
-        {loading && <p className="hint">Searching the web and reading the results. This can take up to 30 seconds.</p>}
+        {loading && <p className="hint">Searching the web and reading the results. This can take up to a minute.</p>}
         {error && <p className="error">{error}</p>}
         {data?.needsFounder && (
           <PickCompany startupName={data.startupName} candidates={data.candidates} onPick={runSearch} />
