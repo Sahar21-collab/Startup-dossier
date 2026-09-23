@@ -29,9 +29,10 @@ export async function POST(request) {
   const lookupKey = makeLookupKey(startupName, founderName);
 
   try {
-    // 1. Already searched before? Return the saved result.
+    // 1. Already searched before? Return the saved result, unless it was saved
+    // before the dossier gained a section (then we search again and replace it).
     const saved = await findSaved(lookupKey);
-    if (saved) {
+    if (saved && saved.result?.founderBackground) {
       return Response.json({ result: tidySavedResult(saved.result), cached: true, savedAt: saved.created_at });
     }
 
