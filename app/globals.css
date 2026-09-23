@@ -414,3 +414,28 @@ h3 {
   .kpis li { flex-direction: column; gap: 2px; }
   .kpi-value { text-align: left; }
 }
+
+/* "Which company do you mean?" chooser */
+.pick-title {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.pick-list { list-style: none; margin: 18px 0 0; padding: 0; }
+
+.pick-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+.pick-name { margin: 0 0 2px; font-weight: 600; }
+
+@media (max-width: 600px) {
+  .pick-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+}

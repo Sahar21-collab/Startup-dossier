@@ -118,6 +118,35 @@ function Dossier({ result, cached, savedAt }) {
   );
 }
 
+function PickCompany({ startupName, candidates, onPick }) {
+  return (
+    <article className="card">
+      <h2 className="pick-title">Which {startupName} do you mean?</h2>
+      <p className="subtitle">
+        Several different companies use this name. Pick one, or type the founder name in the box above and search again.
+      </p>
+      <ul className="pick-list">
+        {candidates.map((c) => (
+          <li className="pick-item" key={`${c.name}-${c.founder}-${c.description}`}>
+            <div>
+              <p className="pick-name">{c.name}</p>
+              <p className="meta">{c.description}</p>
+              <p className="meta">
+                {c.founder !== NA ? `Founded by ${c.founder}` : <span className="na">Founder: {NA}</span>}
+              </p>
+            </div>
+            {c.founder !== NA && (
+              <button type="button" className="link-button" onClick={() => onPick(startupName, c.founder)}>
+                This one
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}
+
 function IndustryPanel({ open, onToggle, checked, onCheck, lists }) {
   return (
     <aside className={open ? "panel panel-open" : "panel"}>
@@ -190,7 +219,7 @@ function IndustryResults({ industryId, state, onOpenDossier }) {
               <p className="industry-text"><strong>Traction:</strong> <Value text={s.evidenceOfSuccess} /></p>
               <p className="industry-links">
                 <button type="button" className="link-button" onClick={() => onOpenDossier(s.name, s.founder)}>
-                  {s.founder !== NA ? "Open full dossier" : "Search this startup"}
+                  Open full dossier
                 </button>
                 {s.sources?.map((src) => (
                   <a key={src.url} href={src.url} target="_blank" rel="noopener noreferrer" className="industry-source">
@@ -246,17 +275,11 @@ export default function Home() {
   }
 
   function openDossier(startup, founder) {
+    const known = founder && founder !== NA ? founder : "";
     setStartupName(startup);
+    setFounderName(known);
     window.scrollTo({ top: 0, behavior: "smooth" });
-
-    // Founder unknown: fill in the startup and let the visitor type the founder.
-    if (!founder || founder === NA) {
-      setFounderName("");
-      founderInput.current?.focus();
-      return;
-    }
-    setFounderName(founder);
-    runSearch(startup, founder);
+    runSearch(startup, known);
   }
 
   async function handleCheck(id, isChecked) {
@@ -288,7 +311,7 @@ export default function Home() {
 
       <main className="page page-with-panel">
         <h1 className="title">Startup Stories</h1>
-        <p className="subtitle">Enter a startup and its founder. We search the web and write a sourced summary.</p>
+        <p className="subtitle">Enter a startup name. We search the web and write a sourced summary. Add the founder only if we ask.</p>
 
         <form className="search" onSubmit={handleSubmit}>
           <input
@@ -301,19 +324,21 @@ export default function Home() {
           />
           <input
             ref={founderInput}
-            aria-label="Founder name"
-            placeholder="Founder name"
+            aria-label="Founder name (optional)"
+            placeholder="Founder name (optional)"
             value={founderName}
             onChange={(e) => setFounderName(e.target.value)}
             maxLength={100}
-            required
           />
           <button type="submit" disabled={loading}>{loading ? "Searching…" : "Search"}</button>
         </form>
 
         {loading && <p className="hint">Searching the web and reading the results. This can take up to 30 seconds.</p>}
         {error && <p className="error">{error}</p>}
-        {data && <Dossier result={data.result} cached={data.cached} savedAt={data.savedAt} />}
+        {data?.needsFounder && (
+          <PickCompany startupName={data.startupName} candidates={data.candidates} onPick={runSearch} />
+        )}
+        {data?.result && <Dossier result={data.result} cached={data.cached} savedAt={data.savedAt} />}
 
         {checkedIds.map((id) => (
           <IndustryResults key={id} industryId={id} state={lists[id] || {}} onOpenDossier={openDossier} />

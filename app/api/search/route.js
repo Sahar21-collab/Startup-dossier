@@ -18,8 +18,9 @@ export async function POST(request) {
   const startupName = String(body?.startupName || "").trim();
   const founderName = String(body?.founderName || "").trim();
 
-  if (!startupName || !founderName) {
-    return Response.json({ error: "Please enter both a startup name and a founder name." }, { status: 400 });
+  // The founder name is optional. It is only asked for when several companies share a name.
+  if (!startupName) {
+    return Response.json({ error: "Please enter a startup name." }, { status: 400 });
   }
   if (startupName.length > MAX_LENGTH || founderName.length > MAX_LENGTH) {
     return Response.json({ error: "Names must be under 100 characters." }, { status: 400 });
@@ -44,6 +45,11 @@ export async function POST(request) {
 
     // 3. Ask Gemini to write the dossier from the search results.
     const result = await summarize(startupName, founderName, pages);
+
+    // Several companies share this name: ask the visitor which one, and save nothing.
+    if (result.needsFounder) {
+      return Response.json({ needsFounder: true, candidates: result.candidates, startupName });
+    }
 
     // 4. Save it for next time.
     await saveResult(lookupKey, startupName, founderName, result);
