@@ -1,5 +1,5 @@
 import { findSaved, makeLookupKey, saveResult } from "@/lib/db";
-import { emptyDossier, summarize } from "@/lib/gemini";
+import { emptyDossier, summarize, tidySavedResult } from "@/lib/gemini";
 import { searchWeb } from "@/lib/tavily";
 
 export const runtime = "nodejs";
@@ -32,7 +32,7 @@ export async function POST(request) {
     // 1. Already searched before? Return the saved result.
     const saved = await findSaved(lookupKey);
     if (saved) {
-      return Response.json({ result: saved.result, cached: true, savedAt: saved.created_at });
+      return Response.json({ result: tidySavedResult(saved.result), cached: true, savedAt: saved.created_at });
     }
 
     // 2. Search the web.
@@ -57,6 +57,12 @@ export async function POST(request) {
     return Response.json({ result, cached: false });
   } catch (err) {
     console.error("Search failed:", err);
+    if (err?.busy) {
+      return Response.json(
+        { error: "The free AI service is busy at the moment. Please wait a minute and search again." },
+        { status: 503 }
+      );
+    }
     return Response.json(
       { error: "Something went wrong while searching. Please try again in a minute." },
       { status: 500 }
