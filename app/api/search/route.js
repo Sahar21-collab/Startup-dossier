@@ -1,5 +1,5 @@
 import { findSaved, makeLookupKey, saveResult } from "@/lib/db";
-import { emptyDossier, summarize, tidySavedResult } from "@/lib/gemini";
+import { DOSSIER_VERSION, emptyDossier, summarize, tidySavedResult } from "@/lib/gemini";
 import { searchWeb } from "@/lib/tavily";
 
 export const runtime = "nodejs";
@@ -29,10 +29,10 @@ export async function POST(request) {
   const lookupKey = makeLookupKey(startupName, founderName);
 
   try {
-    // 1. Already searched before? Return the saved result, unless it was saved
-    // before the dossier gained a section (then we search again and replace it).
+    // 1. Already searched before? Return the saved result, unless it was written
+    // under older rules (then we search again and replace it).
     const saved = await findSaved(lookupKey);
-    if (saved && saved.result?.founderBackground) {
+    if (saved && saved.result?.version === DOSSIER_VERSION) {
       return Response.json({ result: tidySavedResult(saved.result), cached: true, savedAt: saved.created_at });
     }
 
