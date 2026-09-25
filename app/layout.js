@@ -11,7 +11,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <Nav />
-        {children}
+        <div className="content-box">{children}</div>
       </body>
     </html>
   );
