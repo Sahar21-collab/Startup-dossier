@@ -469,3 +469,146 @@ h3 {
   padding-top: 24px;
   border-top: 1px solid var(--line);
 }
+
+/* ---------- Projects page (portfolio layout) ---------- */
+.portfolio {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 56px 20px 90px;
+}
+
+/* Hero: round photo, one sentence, a button */
+.hero { text-align: center; }
+
+.avatar {
+  width: 148px;
+  height: 148px;
+  margin: 0 auto 28px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px dashed #cfd2d6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--faint);
+  font-size: 0.8rem;
+}
+
+.hero-text {
+  max-width: 620px;
+  margin: 0 auto 24px;
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.ghost-button {
+  padding: 10px 20px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.ghost-button:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Strip of logo placeholders */
+.logos { margin-top: 72px; text-align: center; }
+
+.logos-label {
+  margin: 0 0 18px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+}
+
+.logo-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.logo-box {
+  width: 126px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card);
+  border: 1px dashed #cfd2d6;
+  border-radius: 10px;
+  color: var(--faint);
+  font-size: 0.78rem;
+}
+
+/* Recent work */
+.work { margin-top: 84px; }
+
+.work-title {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 32px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.project { margin-bottom: 72px; }
+
+.project-title {
+  font-family: var(--serif);
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0 0 10px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+
+.project-text {
+  max-width: 620px;
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.project-link {
+  display: inline-block;
+  margin-bottom: 22px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  background: var(--card);
+  border: 1px dashed #cfd2d6;
+  border-radius: 14px;
+  color: var(--faint);
+  font-size: 0.85rem;
+}
+
+.contact { margin-top: 24px; text-align: center; }
+.contact .work-title { border-bottom: 0; padding-bottom: 0; }
+.contact .project-text { margin: 0 auto 20px; }
+
+@media (max-width: 600px) {
+  .portfolio { padding: 36px 16px 60px; }
+  .hero-text { font-size: 1.2rem; }
+  .project-title { font-size: 1.45rem; }
+  .logo-box { width: 104px; height: 46px; }
+}
