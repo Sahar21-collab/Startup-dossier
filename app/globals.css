@@ -542,7 +542,7 @@ body:has(.portfolio) .content-box {
 
 /* Wide top panel: small side margins, grey at the top, fading to white lower down */
 .hero-panel {
-  margin: 10px 10px 0;
+  margin: 10px 20px 0;
   padding: 72px 24px 64px;
   border-radius: 22px 22px 0 0;
   background: linear-gradient(180deg, #eff0f2 0%, #f4f5f6 45%, #ffffff 100%);
