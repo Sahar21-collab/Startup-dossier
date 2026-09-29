@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const PLACEHOLDER_EMAIL = "your.email@example.com";
+const EMAIL = "sahar.r.mohammadi@gmail.com";
 
 const PROJECTS = [
   {
@@ -30,7 +30,7 @@ export default function Projects() {
 
   async function copyEmail() {
     try {
-      await navigator.clipboard.writeText(PLACEHOLDER_EMAIL);
+      await navigator.clipboard.writeText(EMAIL);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -45,7 +45,7 @@ export default function Projects() {
           <span>Photo</span>
         </div>
         <p className="hero-text">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.
+          I turn qualitative and quantitative data into clear, impactful product decisions.
         </p>
         <button type="button" className="ghost-button" onClick={copyEmail}>
           {copied ? "Copied" : "Copy email"}
@@ -79,6 +79,7 @@ export default function Projects() {
       <section className="contact">
         <h2 className="work-title">Get in touch</h2>
         <p className="project-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <p className="contact-email"><a href={`mailto:${EMAIL}`}>{EMAIL}</a></p>
         <button type="button" className="ghost-button" onClick={copyEmail}>
           {copied ? "Copied" : "Copy email"}
         </button>
