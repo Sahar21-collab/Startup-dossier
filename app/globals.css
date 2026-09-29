@@ -42,25 +42,30 @@ a { color: var(--accent); text-underline-offset: 3px; }
   gap: 16px;
   max-width: none;
   margin: 0;
-  /* Name hugs the far left, LinkedIn the far right, links centred between them. */
-  padding: 12px 40px;
+  /* Name hugs the far left, LinkedIn the far right, links centred between them.
+     20px above and below keeps the items in the middle of a tall bar. */
+  padding: 20px 40px;
   transition: box-shadow 0.2s ease, background 0.2s ease, padding 0.2s ease;
 }
 
-.nav-bar-floating { background: transparent; }
+.nav-bar-floating {
+  background: transparent;
+  /* 16px gap between the floating bar and the top of the screen */
+  padding-top: 16px;
+}
 
 .nav-bar-floating .nav-inner {
   max-width: 940px;
-  margin: 10px auto;
+  margin: 0 auto;
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 10px 14px 10px 24px;
+  padding: 20px 20px 20px 28px;
   box-shadow: 0 10px 30px rgba(20, 20, 20, 0.10);
 }
 
 @media (max-width: 980px) {
-  .nav-bar-floating .nav-inner { margin: 10px 16px; }
+  .nav-bar-floating .nav-inner { margin: 0 16px; }
 }
 
 .brand {
