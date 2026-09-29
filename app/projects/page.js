@@ -40,6 +40,7 @@ export default function Projects() {
 
   return (
     <main className="portfolio">
+      <div className="hero-panel">
       <section className="hero">
         <div className="avatar" role="img" aria-label="Photo placeholder">
           <span>Photo</span>
@@ -60,15 +61,18 @@ export default function Projects() {
           ))}
         </ul>
       </section>
+      </div>
 
       <section className="work">
         <h2 className="work-title">Recent work</h2>
 
         {PROJECTS.map((project) => (
           <article className="project" key={project.title}>
-            <h3 className="project-title">{project.title}</h3>
-            <p className="project-text">{project.text}</p>
-            <span className="project-link">View project →</span>
+            <div className="project-copy">
+              <h3 className="project-title">{project.title}</h3>
+              <p className="project-text">{project.text}</p>
+              <span className="project-link">View project →</span>
+            </div>
             <div className="image-placeholder" role="img" aria-label="Project image placeholder">
               <span>Image</span>
             </div>
