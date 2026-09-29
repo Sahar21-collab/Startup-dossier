@@ -25,18 +25,41 @@ body {
 
 a { color: var(--accent); text-underline-offset: 3px; }
 
-/* Menu: a white bar across the top */
+/* Menu: name on the left, links in the middle, LinkedIn on the right.
+   Once the page scrolls, the bar becomes a floating rounded pill. */
 .nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
   background: #ffffff;
+  transition: background 0.2s ease;
 }
 
 .nav-inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 16px;
   max-width: 1120px;
   margin: 0 auto;
   padding: 12px 20px;
+  transition: box-shadow 0.2s ease, background 0.2s ease, padding 0.2s ease;
+}
+
+.nav-bar-floating { background: transparent; }
+
+.nav-bar-floating .nav-inner {
+  max-width: 940px;
+  margin: 10px auto;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 14px 10px 24px;
+  box-shadow: 0 10px 30px rgba(20, 20, 20, 0.10);
+}
+
+@media (max-width: 980px) {
+  .nav-bar-floating .nav-inner { margin: 10px 16px; }
 }
 
 .brand {
@@ -48,32 +71,17 @@ a { color: var(--accent); text-underline-offset: 3px; }
   white-space: nowrap;
 }
 
-/* The ☰ button only exists on small screens */
-.nav-toggle {
-  display: none;
-  margin-left: auto;
-  padding: 6px 10px;
-  font-size: 1.15rem;
-  line-height: 1;
-  color: var(--ink);
-  background: none;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  cursor: pointer;
-}
-
 .nav {
   display: flex;
   gap: 4px;
   align-items: center;
-  flex-wrap: wrap;
-  margin-left: auto;
+  justify-content: center;
 }
 
 .nav-link {
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: 8px;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 500;
   color: var(--muted);
   text-decoration: none;
@@ -88,32 +96,65 @@ a { color: var(--accent); text-underline-offset: 3px; }
   font-weight: 600;
 }
 
-/* Phones: hide the list behind the ☰ button */
-@media (max-width: 760px) {
+.nav-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #ffffff;
+}
+
+.social-link:hover { background: var(--accent); }
+
+/* The ☰ button only exists on small screens */
+.nav-toggle {
+  display: none;
+  padding: 6px 10px;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Phones: name left, icons right, links hidden behind the ☰ button */
+@media (max-width: 860px) {
+  .nav-inner { grid-template-columns: 1fr auto; }
   .nav-toggle { display: block; }
 
   .nav {
     display: none;
     position: absolute;
-    left: 0;
-    right: 0;
-    top: 100%;
+    left: 12px;
+    right: 12px;
+    top: calc(100% + 6px);
     z-index: 20;
     flex-direction: column;
     align-items: stretch;
     gap: 2px;
-    margin: 0;
-    padding: 8px 12px 14px;
+    padding: 10px 12px 14px;
     background: #ffffff;
-    border-bottom: 1px solid var(--line);
-    box-shadow: 0 10px 24px rgba(20, 20, 20, 0.06);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(20, 20, 20, 0.08);
   }
 
   .nav-open { display: flex; }
-
-  .nav-bar { position: relative; }
-
-  .nav-link { padding: 12px 12px; font-size: 1rem; }
+  .nav-bar { position: sticky; }
+  .nav-inner { position: relative; }
+  .nav-link { padding: 12px; font-size: 1rem; }
 }
 
 /* Everything below the menu sits in a very light grey box */
