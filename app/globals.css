@@ -51,12 +51,12 @@ a { color: var(--accent); text-underline-offset: 3px; }
 
 .nav-bar-floating {
   background: transparent;
-  padding-left: 72px;
-  padding-right: 72px;
+  padding-left: 76px;
+  padding-right: 76px;
 }
 
 .nav-bar-floating .nav-inner {
-  max-width: none;
+  max-width: 1256px;
   margin: 0 auto;
   background: #ffffff;
   border: 1px solid var(--line);
@@ -668,9 +668,9 @@ body:has(.portfolio) .content-box {
 
 /* Project boxes: narrower than the top panel, so wider side margins */
 .work {
-  max-width: none;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 24px 40px 0;
+  padding: 24px 44px 0;
 }
 
 .work-title {
@@ -730,9 +730,9 @@ body:has(.portfolio) .content-box {
 }
 
 .contact {
-  max-width: none;
+  max-width: 1320px;
   margin: 8px auto 0;
-  padding: 48px 40px;
+  padding: 48px 44px;
   text-align: center;
 }
 
