@@ -31,6 +31,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
   position: sticky;
   top: 0;
   z-index: 30;
+  padding-top: 16px;
   background: #ffffff;
   transition: background 0.2s ease;
 }
@@ -48,11 +49,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
   transition: box-shadow 0.2s ease, background 0.2s ease, padding 0.2s ease;
 }
 
-.nav-bar-floating {
-  background: transparent;
-  /* 16px gap between the floating bar and the top of the screen */
-  padding-top: 16px;
-}
+.nav-bar-floating { background: transparent; }
 
 .nav-bar-floating .nav-inner {
   max-width: 940px;
@@ -166,7 +163,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
 /* Everything below the menu sits in a very light grey box */
 .content-box {
   max-width: 1160px;
-  margin: 32px auto 40px;
+  margin: 16px auto 40px;
   padding: 8px;
   background: var(--box);
   border: 1px solid var(--line);
@@ -588,7 +585,7 @@ body:has(.portfolio) .content-box {
 
 /* Wide top panel: small side margins, grey at the top, fading to white lower down */
 .hero-panel {
-  margin: 32px 40px 0;
+  margin: 16px 40px 0;
   padding: 72px 24px 64px;
   border-radius: 22px 22px 0 0;
   background: linear-gradient(180deg, #f4f2ef 0%, #f4f2ef 35%, #ffffff 100%);
