@@ -28,7 +28,6 @@ a { color: var(--accent); text-underline-offset: 3px; }
 /* Menu: a white bar across the top */
 .nav-bar {
   background: #ffffff;
-  border-bottom: 1px solid var(--line);
 }
 
 .nav-inner {
@@ -120,7 +119,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
 /* Everything below the menu sits in a very light grey box */
 .content-box {
   max-width: 1160px;
-  margin: 24px auto 40px;
+  margin: 32px auto 40px;
   padding: 8px;
   background: var(--box);
   border: 1px solid var(--line);
@@ -542,7 +541,7 @@ body:has(.portfolio) .content-box {
 
 /* Wide top panel: small side margins, grey at the top, fading to white lower down */
 .hero-panel {
-  margin: 10px 40px 0;
+  margin: 32px 40px 0;
   padding: 72px 24px 64px;
   border-radius: 22px 22px 0 0;
   background: linear-gradient(180deg, #eff0f2 0%, #f4f5f6 45%, #ffffff 100%);
