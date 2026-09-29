@@ -1,6 +1,6 @@
 :root {
   --bg: #ffffff;        /* page behind everything, same white as the menu */
-  --box: #f4f5f6;       /* very light grey box holding the content */
+  --box: #f4f2ef;       /* warm off-white box holding the content */
   --card: #ffffff;
   --ink: #1c1c1a;
   --muted: #6b6a66;
