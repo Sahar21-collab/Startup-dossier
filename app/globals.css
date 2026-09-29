@@ -51,12 +51,12 @@ a { color: var(--accent); text-underline-offset: 3px; }
 
 .nav-bar-floating {
   background: transparent;
-  padding-left: 76px;
-  padding-right: 76px;
+  padding-left: 84px;
+  padding-right: 84px;
 }
 
 .nav-bar-floating .nav-inner {
-  max-width: 1256px;
+  max-width: 1152px;
   margin: 0 auto;
   background: #ffffff;
   border: 1px solid var(--line);
