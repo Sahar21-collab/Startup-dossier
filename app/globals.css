@@ -808,3 +808,38 @@ body:has(.portfolio) .content-box {
   font-size: 0.78rem;
   color: var(--muted);
 }
+
+/* Chart controls and cursor */
+.chart-ranges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.range-button {
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 0.78rem;
+  color: var(--muted);
+  background: var(--box);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.range-button:hover { color: var(--ink); }
+
+.range-active {
+  color: var(--accent);
+  border-color: var(--line);
+  background: #fff;
+  font-weight: 600;
+}
+
+.chart-when { font-size: 0.78rem; color: var(--faint); }
+.chart-cursor { stroke: var(--faint); stroke-width: 1; stroke-dasharray: 3 3; }
+.chart-year { cursor: pointer; }
+.chart-year:hover text { fill: var(--ink); font-weight: 600; }
+.chart-svg { touch-action: pan-y; }
+.chart-tip { color: var(--faint); }
