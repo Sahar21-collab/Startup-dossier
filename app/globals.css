@@ -846,3 +846,45 @@ body:has(.portfolio) .content-box {
 
 .chart-when .up { color: #22614a; }
 .chart-when .down { color: #a33a2b; }
+
+/* Topic buttons on the Tech news page */
+.topic-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.topic-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--muted);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.topic-button:hover:not(:disabled) { color: var(--ink); border-color: var(--muted); }
+.topic-button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.topic-active {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.topic-count {
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--box);
+  color: var(--muted);
+}
+
+.topic-active .topic-count { background: #ffffff33; color: #fff; }
