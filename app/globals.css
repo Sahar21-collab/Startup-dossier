@@ -843,3 +843,6 @@ body:has(.portfolio) .content-box {
 .chart-year:hover text { fill: var(--ink); font-weight: 600; }
 .chart-svg { touch-action: pan-y; }
 .chart-tip { color: var(--faint); }
+
+.chart-when .up { color: #22614a; }
+.chart-when .down { color: #a33a2b; }

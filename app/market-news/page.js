@@ -8,11 +8,14 @@ const PAD = { top: 18, right: 12, bottom: 28, left: 56 };
 const INNER_W = WIDTH - PAD.left - PAD.right;
 const INNER_H = HEIGHT - PAD.top - PAD.bottom;
 
+// Short periods use daily prices, long ones use monthly prices.
 const RANGES = [
-  { id: "1y", label: "1Y", years: 1 },
-  { id: "5y", label: "5Y", years: 5 },
-  { id: "10y", label: "10Y", years: 10 },
-  { id: "all", label: "Max", years: null },
+  { id: "1m", label: "1M", days: 30, daily: true },
+  { id: "6m", label: "6M", days: 182, daily: true },
+  { id: "1y", label: "1Y", days: 365, daily: true },
+  { id: "5y", label: "5Y", days: 365 * 5, daily: false },
+  { id: "10y", label: "10Y", days: 365 * 10, daily: false },
+  { id: "all", label: "Max", days: null, daily: false },
 ];
 
 function money(value) {
@@ -24,7 +27,15 @@ function monthYear(ms) {
   return new Date(ms).toLocaleDateString("en-GB", { month: "short", year: "numeric" });
 }
 
-function Chart({ market }) {
+function dayMonthYear(ms) {
+  return new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function clockTime(iso) {
+  return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function Chart({ market, quote }) {
   const { color } = market;
   const [range, setRange] = useState("all");
   const [startYear, setStartYear] = useState(null); // set by clicking a year label
@@ -33,18 +44,24 @@ function Chart({ market }) {
 
   // The points currently on screen, after the chosen period or clicked year.
   const points = useMemo(() => {
-    const all = market.points;
+    const monthly = market.monthly || [];
+    const daily = market.daily || [];
+
     if (startYear) {
       const from = new Date(startYear, 0, 1).getTime();
-      const picked = all.filter((p) => p.t >= from);
-      return picked.length > 1 ? picked : all;
+      // Daily detail if that year is inside the 2 years of daily prices we hold.
+      const source = daily.length && daily[0].t <= from ? daily : monthly;
+      const picked = source.filter((p) => p.t >= from);
+      return picked.length > 1 ? picked : monthly;
     }
-    const years = RANGES.find((r) => r.id === range)?.years;
-    if (!years) return all;
-    const from = Date.now() - years * 365.25 * 24 * 3600 * 1000;
-    const picked = all.filter((p) => p.t >= from);
-    return picked.length > 1 ? picked : all;
-  }, [market.points, range, startYear]);
+
+    const option = RANGES.find((r) => r.id === range);
+    if (!option?.days) return monthly;
+    const source = option.daily && daily.length ? daily : monthly;
+    const from = Date.now() - option.days * 24 * 3600 * 1000;
+    const picked = source.filter((p) => p.t >= from);
+    return picked.length > 1 ? picked : monthly;
+  }, [market.monthly, market.daily, range, startYear]);
 
   const view = useMemo(() => {
     const values = points.map((p) => p.v);
@@ -60,13 +77,31 @@ function Chart({ market }) {
 
   // Year labels under the chart. Clicking one starts the chart at that year.
   const ticks = useMemo(() => {
+    const spanDays = (points[points.length - 1].t - points[0].t) / (24 * 3600 * 1000);
+
+    // Short period: show dates, which are not clickable (there is only one year).
+    if (spanDays <= 400) {
+      const count = Math.min(5, points.length);
+      const step = Math.max(1, Math.floor((points.length - 1) / (count - 1)));
+      const out = [];
+      for (let i = 0; i < points.length; i += step) {
+        const d = new Date(points[i].t);
+        out.push({
+          label: spanDays <= 70
+            ? d.toLocaleDateString("en-GB", { day: "numeric", month: "short" })
+            : d.toLocaleDateString("en-GB", { month: "short", year: "2-digit" }),
+          i,
+          year: null,
+        });
+      }
+      return out;
+    }
+
     const years = [...new Set(points.map((p) => new Date(p.t).getFullYear()))];
     const step = Math.max(1, Math.ceil(years.length / 6));
-    const picked = years.filter((_, i) => i % step === 0);
-    return picked.map((label) => {
-      const i = points.findIndex((p) => new Date(p.t).getFullYear() === label);
-      return { label, i };
-    });
+    return years
+      .filter((_, i) => i % step === 0)
+      .map((year) => ({ label: year, year, i: points.findIndex((p) => new Date(p.t).getFullYear() === year) }));
   }, [points]);
 
   function pointFromEvent(event) {
@@ -83,8 +118,14 @@ function Chart({ market }) {
 
   const first = points[0];
   const last = points[points.length - 1];
-  const shown = hover != null ? points[hover] : last;
-  const changeShown = Number((((last.v - first.v) / first.v) * 100).toFixed(1));
+  const livePrice = quote?.price ?? last.v;
+  const shown = hover != null ? points[hover] : { v: livePrice, t: quote?.at ?? last.t };
+  const changeShown = Number((((livePrice - first.v) / first.v) * 100).toFixed(1));
+  const dayChange =
+    quote?.previousClose
+      ? Number((((livePrice - quote.previousClose) / quote.previousClose) * 100).toFixed(2))
+      : null;
+  const useDays = points.length > 1 && points[1].t - points[0].t < 20 * 24 * 3600 * 1000;
 
   return (
     <article className="chart-card">
@@ -95,7 +136,18 @@ function Chart({ market }) {
         </div>
         <div className="chart-price">
           <span className="chart-last">{money(shown.v)}</span>
-          <span className="chart-when">{monthYear(shown.t)}{hover == null ? " (latest)" : ""}</span>
+          {hover == null ? (
+            <span className="chart-when">
+              live price
+              {dayChange != null && (
+                <span className={dayChange >= 0 ? " up" : " down"}>
+                  {" "}{dayChange >= 0 ? "▲" : "▼"} {Math.abs(dayChange)}% today
+                </span>
+              )}
+            </span>
+          ) : (
+            <span className="chart-when">{useDays ? dayMonthYear(shown.t) : monthYear(shown.t)}</span>
+          )}
         </div>
       </header>
 
@@ -147,13 +199,13 @@ function Chart({ market }) {
         {/* clickable years */}
         {ticks.map((t) => (
           <g
-            key={t.label}
-            className="chart-year"
-            role="button"
-            tabIndex={0}
-            onMouseDown={() => { setStartYear(t.label); setHover(null); }}
-            onTouchStart={() => { setStartYear(t.label); setHover(null); }}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setStartYear(t.label); setHover(null); } }}
+            key={`${t.label}-${t.i}`}
+            className={t.year ? "chart-year" : undefined}
+            role={t.year ? "button" : undefined}
+            tabIndex={t.year ? 0 : undefined}
+            onMouseDown={t.year ? () => { setStartYear(t.year); setHover(null); } : undefined}
+            onTouchStart={t.year ? () => { setStartYear(t.year); setHover(null); } : undefined}
+            onKeyDown={t.year ? (e) => { if (e.key === "Enter" || e.key === " ") { setStartYear(t.year); setHover(null); } } : undefined}
           >
             {/* invisible box so the year is easy to click or tap */}
             <rect x={view.x(t.i) - 24} y={HEIGHT - 24} width="48" height="22" fill="transparent" />
@@ -171,7 +223,7 @@ function Chart({ market }) {
       </svg>
 
       <p className="chart-foot">
-        {monthYear(first.t)} → {monthYear(last.t)}: {changeShown >= 0 ? "+" : ""}{changeShown}%
+        {useDays ? dayMonthYear(first.t) : monthYear(first.t)} → now: {changeShown >= 0 ? "+" : ""}{changeShown}%
         <span className="chart-tip"> · click a year to start there, hover the chart for a price</span>
       </p>
     </article>
@@ -184,18 +236,31 @@ export default function MarketNews() {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+
+    async function load() {
       try {
-        const res = await fetch("/api/markets");
+        const res = await fetch("/api/markets", { cache: "no-store" });
         const json = await res.json();
         if (cancelled) return;
         if (!res.ok) throw new Error(json.error || "Something went wrong.");
         setData(json);
+        setError("");
       } catch (err) {
         if (!cancelled) setError(err.message);
       }
-    })();
-    return () => { cancelled = true; };
+    }
+
+    load();
+    // Keep the prices current while the page stays open.
+    const timer = setInterval(load, 60000);
+    const onFocus = () => load();
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+      window.removeEventListener("focus", onFocus);
+    };
   }, []);
 
   return (
@@ -209,12 +274,15 @@ export default function MarketNews() {
       {data && (
         <>
           <div className="chart-grid-wrap">
-            {data.series.map((market) => <Chart key={market.id} market={market} />)}
+            {data.series.map((market) => (
+              <Chart key={market.id} market={market} quote={data.quotes?.[market.id]} />
+            ))}
           </div>
           {data.refreshedAt && (
             <p className="cache-note">
-              Prices updated {new Date(data.refreshedAt).toLocaleString()} · monthly closing prices from Yahoo Finance
-              {data.stale ? " (the latest update failed, showing the previous prices)" : ""}
+              Live prices checked at {data.quotedAt ? clockTime(data.quotedAt) : "—"}, refreshed every minute while this page is open ·
+              {" "}history updated {new Date(data.refreshedAt).toLocaleDateString()} · source: Yahoo Finance
+              {data.stale ? " (the latest history update failed, showing the previous one)" : ""}
             </p>
           )}
         </>
