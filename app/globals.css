@@ -754,3 +754,57 @@ body:has(.portfolio) .content-box {
 }
 
 .contact-email { margin: 0 0 16px; font-size: 0.95rem; }
+
+/* ---------- Market news charts ---------- */
+.chart-grid-wrap {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 20px;
+  margin-top: 8px;
+}
+
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px 22px 18px;
+}
+
+.chart-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.chart-title {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.chart-unit { margin: 2px 0 0; font-size: 0.78rem; color: var(--faint); }
+
+.chart-price { text-align: right; white-space: nowrap; }
+
+.chart-last {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.chart-change { font-size: 0.78rem; }
+.chart-change.up { color: #22614a; }
+.chart-change.down { color: #a33a2b; }
+
+.chart-svg { width: 100%; height: auto; display: block; }
+.chart-grid { stroke: var(--line); stroke-width: 1; }
+.chart-axis { font-size: 10px; fill: var(--faint); font-family: var(--sans); }
+
+.chart-foot {
+  margin: 10px 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
